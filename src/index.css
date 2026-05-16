@@ -1,0 +1,566 @@
+@import "tailwindcss";
+
+/* ---------- Tailwind theme extensions ---------- */
+@theme {
+  --color-navy-50: #f2f5fa;
+  --color-navy-100: #e3e9f3;
+  --color-navy-200: #c2cde0;
+  --color-navy-700: #1a3463;
+  --color-navy-800: #122a52;
+  --color-navy-900: #0B1D3A;
+  --color-navy-950: #060f22;
+
+  --color-teal-50: #effdfa;
+  --color-teal-100: #cdfaf1;
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14B8A6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+
+  /* NOTE: These tokens keep the `amber` name for Tailwind class compatibility,
+     but the palette has been shifted to warm terracotta for a subtle regional
+     accent. Original amber values preserved in git history if we need to revert. */
+  --color-amber-400: #E8A04F;
+  --color-amber-500: #C26E3A;
+  --color-amber-600: #A0552A;
+  --color-amber-700: #7A3E1F;
+
+  --color-orange-600: #EA580C;
+  --color-orange-700: #C2410C;
+
+  --font-display: "Fraunces", serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+
+  --shadow-card: 0 1px 2px rgba(11,29,58,0.04), 0 8px 24px rgba(11,29,58,0.06);
+  --shadow-card-lg: 0 2px 4px rgba(11,29,58,0.04), 0 24px 48px -12px rgba(11,29,58,0.12);
+  --shadow-glow: 0 0 0 1px rgba(20,184,166,0.25), 0 12px 32px -8px rgba(20,184,166,0.35);
+}
+
+/* ---------- Base ---------- */
+html { scroll-padding-top: 88px; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #fafbfd;
+  color: #0B1D3A;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: 'Fraunces', serif;
+  letter-spacing: -0.015em;
+  font-feature-settings: "ss01";
+}
+
+/* ---------- Hero gradient background ---------- */
+.hero-bg {
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(225,83,11,0.08), transparent 60%),
+    radial-gradient(900px 520px at 8% 15%, rgba(245,158,11,0.10), transparent 60%),
+    radial-gradient(800px 400px at 75% 90%, rgba(20,184,166,0.06), transparent 65%),
+    linear-gradient(180deg, #FBF6EC 0%, #F8F1E1 50%, #F4EBD7 100%);
+}
+
+/* Faint grid */
+.hero-grid::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(11,29,58,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11,29,58,0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 75%);
+  pointer-events: none;
+}
+
+/* ---------- Floating shapes ---------- */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-18px) rotate(var(--r, 0deg)); }
+}
+@keyframes floatY2 {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(14px) rotate(var(--r, 0deg)); }
+}
+.float-a { animation: floatY 9s ease-in-out infinite; }
+.float-b { animation: floatY2 11s ease-in-out infinite; }
+.float-c { animation: floatY 13s ease-in-out infinite; }
+
+/* ---------- Counter pulse ---------- */
+@keyframes softPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.pulse-dot { animation: softPulse 2.2s ease-in-out infinite; }
+
+/* ---------- Nav underline ---------- */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: '';
+  position: absolute; left: 12px; right: 12px; bottom: 6px;
+  height: 2px; background: #14B8A6; border-radius: 2px;
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .25s ease;
+}
+.nav-link:hover::after { transform: scaleX(1); }
+
+/* ---------- Focus ring ---------- */
+.ring-brand:focus { outline: none; box-shadow: 0 0 0 3px rgba(20,184,166,0.25); border-color: #14B8A6; }
+
+/* ---------- Button shimmer ---------- */
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.18) 50%, transparent 80%);
+  transform: translateX(-100%);
+  transition: transform .6s ease;
+}
+.btn-primary:hover::before { transform: translateX(100%); }
+
+/* ---------- Selection ---------- */
+::selection { background: rgba(20,184,166,0.25); color: #0B1D3A; }
+
+/* ---------- Reveal on scroll ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1);
+  will-change: opacity, transform;
+}
+.reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .float-a, .float-b, .float-c, .pulse-dot { animation: none !important; }
+}
+
+/* ---------- Focus-visible polish ---------- */
+:focus { outline: none; }
+a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(20,184,166,0.35), 0 0 0 1px #14B8A6 inset;
+  border-radius: 10px;
+}
+
+/* Form inputs manage focus via their wrapper's focus-within ring.
+   Just make sure the raw element has no default browser outline. */
+input:focus, input:focus-visible,
+select:focus, select:focus-visible,
+textarea:focus, textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* ---------- Hover lift helper ---------- */
+.btn-lift { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease; }
+.btn-lift:hover { transform: translateY(-2px) scale(1.015); }
+.btn-lift:active { transform: translateY(0) scale(0.995); }
+
+/* ---------- Hero scroll indicator ---------- */
+@keyframes scrollDot {
+  0%   { transform: translateY(0); opacity: 0; }
+  30%  { opacity: 1; }
+  80%  { transform: translateY(14px); opacity: 0; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+.scroll-dot { animation: scrollDot 1.8s cubic-bezier(.3,.6,.2,1) infinite; }
+
+/* ---------- Mobile nav overlay ---------- */
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.nav-overlay { animation: fadeOverlay .2s ease both; }
+.nav-drawer {
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.2,.7,.2,1);
+}
+.nav-drawer.is-open { transform: translateX(0); }
+
+/* ---------- Skeleton shimmer ---------- */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, rgba(11,29,58,0.06) 0%, rgba(11,29,58,0.12) 50%, rgba(11,29,58,0.06) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+
+/* ---------- Spinner ---------- */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 16px; height: 16px; border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #ffffff;
+  animation: spin .7s linear infinite;
+}
+
+/* ---------- WhatsApp pulse ---------- */
+@keyframes waPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(37,211,102,0.55); }
+  70%  { box-shadow: 0 0 0 18px rgba(37,211,102,0); }
+  100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+}
+
+/* ---------- Small screens text safety ---------- */
+@media (max-width: 360px) {
+  h1.hero-head { font-size: 36px !important; line-height: 1.06 !important; }
+}
+
+/* ============================================================
+   DESIGN SYSTEM — Wave 3 visual refresh
+   ------------------------------------------------------------
+   Tokens are global (safe — names don't collide with anything
+   above). Utility classes are scoped under `.design-page` so
+   they don't clash with existing classes or Tailwind defaults
+   (e.g. .btn-primary, .container). To opt a page in, wrap its
+   top-level JSX in <div className="design-page">…</div>.
+   Pages NOT wrapped in .design-page are unaffected.
+   ============================================================ */
+
+:root {
+  /* Ink (text) */
+  --ink: #0E1B2C;
+  --ink-2: #16263C;
+  --ink-soft: #3B4A60;
+  --muted: #6B7A90;
+
+  /* Hairlines */
+  --line: #E6E1D6;
+  --line-2: #D9D3C3;
+
+  /* Paper / cream surfaces */
+  --paper: #F6F1E6;
+  --paper-2: #EFE7D3;
+  --paper-grid: #E7DEC4;
+  --bg: #FBF8F1;
+
+  /* Brand */
+  --orange: #E1530B;
+  --orange-2: #C9430A;
+  --orange-soft: #FBE6D6;
+
+  /* Accent */
+  --teal: #0F8A6F;
+  --teal-soft: #D9F0E7;
+
+  /* Specials */
+  --gold: #B8860B;
+  --red:  #B23A2A;
+}
+
+/* Wrapper — every redesigned page goes inside this */
+.design-page {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Typography helpers */
+.design-page .serif {
+  font-family: 'Fraunces', serif;
+  font-feature-settings: "ss01", "ss02";
+  letter-spacing: -0.01em;
+}
+.design-page .mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Background patterns */
+.design-page .paper-grid {
+  background-image:
+    linear-gradient(var(--paper-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.design-page .dots {
+  background-image: radial-gradient(rgba(14,27,44,.10) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Layout */
+.design-page .container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+.design-page .pad-section { padding: 96px 0; }
+.design-page .pad-section-sm { padding: 72px 0; }
+.design-page .hr { height: 1px; background: var(--line); border: 0; }
+
+/* Cards */
+.design-page .card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.design-page .card-warm {
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+}
+
+/* Section headings */
+.design-page .section-title {
+  font-size: 44px;
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.design-page .section-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 14px;
+}
+.design-page .section-lede {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 640px;
+}
+
+/* Eyebrow pill */
+.design-page .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.design-page .eyebrow .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+/* Buttons (scoped — does NOT override the existing site's .btn-primary) */
+.design-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 15px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  white-space: nowrap;
+}
+.design-page .btn-primary {
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(0,0,0,.05), inset 0 -2px 0 rgba(0,0,0,.10);
+}
+.design-page .btn-primary:hover {
+  background: var(--orange-2);
+  transform: translateY(-1px);
+}
+.design-page .btn-dark { background: var(--ink); color: #fff; }
+.design-page .btn-dark:hover { background: var(--ink-2); transform: translateY(-1px); }
+.design-page .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-2); }
+.design-page .btn-ghost:hover { background: var(--paper); }
+.design-page .btn-white { background: #fff; color: var(--ink); border-color: var(--line-2); }
+.design-page .arrow { transition: transform .2s ease; }
+.design-page .btn:hover .arrow { transform: translateX(2px); }
+
+/* ============================================================
+   MOBILE & TABLET — Wave 3 responsive pass (v2, class-based)
+   ------------------------------------------------------------
+   Targets utility classes added to wrapper divs across the 10
+   redesigned pages. All rules scoped under .design-page so Home
+   and legacy ProductPricingPage routes are unaffected. Desktop
+   (>1024px) renders byte-identical to before.
+
+   Wrapper classes used:
+     .wave-hero        → Hero <div className="container">
+     .wave-hero-grid   → Hero text+visual outer 2-col grid
+     .wave-grid-2      → Inner 2-col card grids
+     .wave-grid-3      → 3-col card grids
+     .wave-grid-4      → 4-col card grids (Features, Why, etc.)
+     .wave-split       → Sticky-left + content-right grids
+     .wave-finalcta    → Big dark FinalCTA cards (1.4fr 1fr)
+   ============================================================ */
+
+@media (max-width: 1024px) {
+
+  /* TABLET (641-1024px): grid-4 → 2 cols. Other splits stay
+     side-by-side but tighter. Hero font caps a bit lower. */
+
+  .design-page .wave-grid-4 {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 18px !important;
+  }
+}
+
+@media (max-width: 640px) {
+
+  /* ----- Container & section padding ----- */
+  .design-page .container {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+  .design-page .pad-section { padding: 56px 0 !important; }
+  .design-page .pad-section-sm { padding: 40px 0 !important; }
+
+  /* ----- Hero: tighter top padding ----- */
+  .design-page .wave-hero {
+    padding: 110px 18px 56px !important;
+  }
+
+  /* ----- Hero & all 2-column splits: stack vertically ----- */
+  .design-page .wave-hero-grid,
+  .design-page .wave-split,
+  .design-page .wave-finalcta {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+
+  /* FinalCTA card: tighten padding */
+  .design-page .wave-finalcta {
+    padding: 36px 22px !important;
+    border-radius: 16px !important;
+  }
+
+  /* ----- Multi-column card grids → single column ----- */
+  .design-page .wave-grid-2,
+  .design-page .wave-grid-3,
+  .design-page .wave-grid-4 {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* ----- Hero typography ----- */
+  .design-page .wave-hero h1.serif,
+  .design-page .wave-hero h1[class*="serif"] {
+    font-size: 38px !important;
+    line-height: 1.04 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  /* Sub-tagline (the small italic line nested inside H1) */
+  .design-page .wave-hero h1 div {
+    font-size: 15px !important;
+    margin-top: 8px !important;
+  }
+
+  /* Hero lede paragraph (first p after the h1) */
+  .design-page .wave-hero p {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+    margin-top: 16px !important;
+  }
+
+  /* ----- Section titles ----- */
+  .design-page .section-title {
+    font-size: 30px !important;
+    line-height: 1.08 !important;
+  }
+
+  /* ----- Section header + lede side-by-side rows: stack ----- */
+  /* Many sections use display:flex justify-content:space-between
+     with align-items:flex-end for the section-kicker/title left
+     and lede right. We don't have a class on these, but they
+     consistently sit inside .pad-section as direct flex children. */
+  .design-page .pad-section > .container > div[style*="flex-end"],
+  .design-page section > .container > div[style*="flex-end"] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+  }
+
+  /* ----- Buttons: tighter padding, wrap better ----- */
+  .design-page .btn {
+    padding: 11px 16px !important;
+    font-size: 13.5px !important;
+  }
+
+  /* ----- Hero trust strip: stats wrap, hide vertical dividers ----- */
+  .design-page .wave-hero [style*="border-top:'1px dashed"],
+  .design-page .wave-hero [style*="border-top: 1px dashed"] {
+    flex-wrap: wrap !important;
+    gap: 14px !important;
+    padding-top: 18px !important;
+    margin-top: 24px !important;
+  }
+  .design-page .wave-hero div[style*="height:36"][style*="background"] {
+    display: none !important;
+  }
+
+  /* ----- Sticky positioning: disable on mobile ----- */
+  .design-page [style*="position:'sticky'"],
+  .design-page [style*="position: sticky"] {
+    position: static !important;
+  }
+
+  /* ----- Decorative visuals: prevent overflow ----- */
+  /* All visual containers cap themselves; ensure they fit width */
+  .design-page section > div > div[style*="maxWidth:"] {
+    max-width: 100% !important;
+  }
+
+  /* ----- HowItWorks/Process horizontal dashed line: hide ----- */
+  /* When steps stack, the absolute-positioned dashed connector
+     across the row makes no sense. */
+  .design-page [style*="repeating-linear-gradient(90deg"] {
+    display: none !important;
+  }
+
+  /* ----- Pricing card big serif price: scale ----- */
+  .design-page section [class*="serif"][style*="fontSize:42"],
+  .design-page section [class*="serif"][style*="fontSize:48"] {
+    font-size: 32px !important;
+  }
+
+  /* ----- "POPULAR"/"BEST ROI" raised plus-card transform: reset ----- */
+  .design-page [style*="translateY(-8px)"] {
+    transform: none !important;
+  }
+
+  /* ----- Decorative orange glow in FinalCTAs: shrink ----- */
+  .design-page .wave-finalcta div[style*="width:400"][style*="height:400"] {
+    width: 200px !important;
+    height: 200px !important;
+    right: -50px !important;
+    top: -50px !important;
+  }
+
+  /* ----- Off-canvas offset transforms: reset ----- */
+  .design-page [style*="translateY(14px)"],
+  .design-page [style*="rotate(-3deg)"],
+  .design-page [style*="rotate(-4deg)"] {
+    transform: none !important;
+  }
+
+  /* ----- Cards: tighter padding ----- */
+  .design-page .card {
+    padding: 20px !important;
+  }
+
+  /* ----- Section-kicker / section-lede: tighten ----- */
+  .design-page .section-kicker { font-size: 11px !important; }
+  .design-page .section-lede { font-size: 14.5px !important; line-height: 1.55 !important; }
+
+  /* ----- Final overflow guard ----- */
+  .design-page section { overflow-x: hidden !important; }
+
+  /* ----- Code editor mono font: tighter ----- */
+  .design-page [class*="mono"] { font-size: 11px !important; }
+}
