@@ -2,27 +2,14 @@ import { Fragment, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from './design/Icon';
 import { siteConfig } from '../config/site';
+import { useCmsData, fetchOffers } from '../lib/cms';
 
 const PHONE_DISPLAY = siteConfig.phones.sales;
 const PHONE_TEL     = siteConfig.phones.sales.replace(/\s|\+/g, '').replace(/^/, '+');
 
-// Master flag — flip to true when real live offers exist
-const OFFERS_ACTIVE = false;
-
-// ============================================================
-// Featured offer — the big hero card
-// ============================================================
-const FEATURED_OFFER = {
-  badge: 'FEATURED',
-  badgeSecondary: 'LIMITED',
-  code: 'UNIQUE25',
-  title: '25% off',
-  subtitle: 'TallyPrime Gold',
-  originalPrice: 67500,
-  finalPrice: 50625,
-  // Set the offer end date — adjust as needed. Currently 21 days from now
-  endsInDays: 21,
-};
+// Offers are managed entirely in the admin panel (offers table). When
+// there are none — or the CMS is unreachable — every section below
+// falls back to the "between offer cycles" state.
 
 // ============================================================
 // Filter categories
@@ -37,140 +24,33 @@ const CATEGORIES = [
 ];
 
 // ============================================================
-// All offer cards — 9 entries matching the design
+// Offer shape helpers — map a CMS row onto what the cards expect.
 // ============================================================
-const OFFERS = [
-  {
-    id: 'tallyprime-gold-festive',
-    category: 'tallyprime',
-    catLabel: 'TALLYPRIME',
-    badge: '-25% OFF',
-    badgeTone: 'orange',
-    title: 'TallyPrime Gold — festive discount',
-    desc: '25% off MRP for unlimited-user Gold edition. Free installation + 30-day onboarding included.',
-    originalPrice: 67500,
-    finalPrice: 50625,
-    priceSuffix: '+ GST',
-    code: 'UNIQUE25',
-    endsLabel: 'Ends 31 May',
-  },
-  {
-    id: 'server-emi',
-    category: 'tallyprime',
-    catLabel: 'TALLYPRIME',
-    badge: 'EMI · 0%',
-    badgeTone: 'orange',
-    title: 'Server edition on zero-cost EMI',
-    desc: 'Split TallyPrime Server payment into 6 EMIs. Nil interest, nil processing fee on HDFC & ICICI cards.',
-    originalPrice: 270000,
-    finalPrice: 45000,
-    priceSuffix: '/month × 6',
-    code: 'EMI-SERVER',
-    endsLabel: 'Ends 30 Jun',
-  },
-  {
-    id: 'mandi-tally-bundle',
-    category: 'bundles',
-    catLabel: 'SOFTTRADE',
-    badge: 'BUNDLE',
-    badgeTone: 'orange',
-    title: 'SoftTrade-Mandi + Tally Gold',
-    desc: 'Buy Tally Gold and get SoftTrade-Mandi at half price. Built for grain, oilseed and cotton mandis.',
-    originalPrice: 85500,
-    finalPrice: 67000,
-    priceSuffix: 'bundle',
-    code: 'MANDI-50',
-    endsLabel: 'Ends 15 Jun',
-    highlight: true,
-  },
-  {
-    id: 'tdl-pack-5',
-    category: 'custom',
-    catLabel: 'CUSTOMISATION',
-    badge: '-30% OFF',
-    badgeTone: 'orange',
-    title: 'TDL pack of 5 — flat rate',
-    desc: 'Five custom voucher / report TDLs at a single bundled rate. Source code handover included.',
-    originalPrice: 35000,
-    finalPrice: 24500,
-    priceSuffix: 'one-time',
-    code: 'TDL5',
-    endsLabel: 'Ends 31 May',
-  },
-  {
-    id: 'amc-3-free',
-    category: 'amc',
-    catLabel: 'AMC & SUPPORT',
-    badge: '+3 MONTHS',
-    badgeTone: 'orange',
-    title: 'Annual AMC — get 3 extra months',
-    desc: 'Buy any annual AMC plan (Basic / Pro / Premium) and we extend it by 3 months. New AMC clients only.',
-    originalPrice: null,
-    finalPrice: null,
-    priceLabel: '15 mo.',
-    priceSuffix: 'for price of 12',
-    code: 'AMC15',
-    endsLabel: 'Ends 30 Jun',
-    highlight: true,
-  },
-  {
-    id: 'starter-pack',
-    category: 'bundles',
-    catLabel: 'BUNDLES',
-    badge: 'STARTER',
-    badgeTone: 'orange',
-    title: 'New-business starter pack',
-    desc: 'TallyPrime Silver + 1-year AMC Basic + 2-hour onboarding. Everything you need to open your books.',
-    originalPrice: 28400,
-    finalPrice: 21999,
-    priceSuffix: '+ GST',
-    code: 'STARTUP',
-    endsLabel: 'Ends 30 Jun',
-  },
-  {
-    id: 'tss-renewal',
-    category: 'tallyprime',
-    catLabel: 'TALLYPRIME',
-    badge: 'TSS',
-    badgeTone: 'orange',
-    title: 'TSS renewal — 10% off',
-    desc: 'Renew your Tally Software Services subscription early and save 10%. All editions eligible.',
-    originalPrice: 4500,
-    finalPrice: 4050,
-    priceSuffix: 'per user / yr',
-    code: 'TSS10',
-    endsLabel: 'Ends 30 Jun',
-  },
-  {
-    id: 'zoho-tally',
-    category: 'custom',
-    catLabel: 'CUSTOMISATION',
-    badge: 'INTEGRATION',
-    badgeTone: 'orange',
-    title: 'Zoho ↔ Tally — flat fee',
-    desc: 'One-time integration setup between Zoho Books and TallyPrime. Includes 2 sync mappings.',
-    originalPrice: 18000,
-    finalPrice: 12500,
-    priceSuffix: 'one-time',
-    code: 'ZOHO12',
-    endsLabel: 'Ends 30 Jun',
-  },
-  {
-    id: 'corporate-training',
-    category: 'amc',
-    catLabel: 'AMC & SUPPORT',
-    badge: 'GROUP',
-    badgeTone: 'orange',
-    title: 'Corporate training — group rate',
-    desc: 'Book a 4-hour TallyPrime training for up to 10 staff. On-site in Jaipur or remote anywhere.',
-    originalPrice: 15000,
-    finalPrice: 9999,
-    priceSuffix: 'flat',
-    code: 'TRAIN10',
-    endsLabel: 'Ends 30 Jun',
-    highlight: true,
-  },
-];
+const CATEGORY_LABEL = {
+  tallyprime: 'TALLYPRIME',
+  softtrade:  'SOFTTRADE',
+  custom:     'CUSTOMISATION',
+  amc:        'AMC & SUPPORT',
+  bundles:    'BUNDLES',
+};
+
+function normalizeOffer(row) {
+  return {
+    id: row.id,
+    category: row.category,
+    catLabel: CATEGORY_LABEL[row.category] || 'OFFER',
+    badge: row.badge || 'OFFER',
+    title: row.title,
+    desc: row.description,
+    originalPrice: row.original_price,
+    finalPrice: row.final_price,
+    priceLabel: row.price_label,
+    priceSuffix: row.price_suffix,
+    code: row.code,
+    endsLabel: row.ends_label,
+    highlight: row.highlight,
+  };
+}
 
 // ============================================================
 // FAQ entries — 5 questions, all answers in user's own voice
@@ -317,8 +197,8 @@ function OfferCard({ offer }) {
 // ============================================================
 // OfferCardsGrid — section that filters OFFERS by activeCategory
 // ============================================================
-function OfferCardsGrid({ activeCategory }) {
-  if (!OFFERS_ACTIVE) {
+function OfferCardsGrid({ activeCategory, offers }) {
+  if (!offers.length) {
     return (
       <section style={{padding:'40px 0 80px', background:'#FBF8F1', borderBottom:'1px solid var(--line)'}}>
         <div className="container" style={{padding:'0 32px'}}>
@@ -356,8 +236,8 @@ function OfferCardsGrid({ activeCategory }) {
   }
 
   const visibleOffers = activeCategory === 'all'
-    ? OFFERS
-    : OFFERS.filter(o => o.category === activeCategory);
+    ? offers
+    : offers.filter(o => o.category === activeCategory);
 
   return (
     <section style={{padding:'80px 0 100px', background:'#FBF8F1', borderBottom:'1px solid var(--line)'}}>
@@ -400,8 +280,8 @@ function OfferCardsGrid({ activeCategory }) {
 // ============================================================
 // HowItWorks — 3-step explainer below the cards grid
 // ============================================================
-function HowItWorks() {
-  if (!OFFERS_ACTIVE) return null;
+function HowItWorks({ hasOffers }) {
+  if (!hasOffers) return null;
   const steps = [
     {
       ic:'msg',
@@ -520,8 +400,10 @@ function CountdownTimer({ endsAt }) {
 // ============================================================
 // Hero — left: copy + CTAs · right: featured offer card with timer
 // ============================================================
-function Hero() {
-  const endsAt = Date.now() + FEATURED_OFFER.endsInDays * 24 * 60 * 60 * 1000;
+function Hero({ featured }) {
+  // Countdown only runs when the admin set an end date that is still ahead.
+  const endsAtRaw = featured?.ends_at ? new Date(featured.ends_at).getTime() : null;
+  const endsAt = endsAtRaw && endsAtRaw > Date.now() ? endsAtRaw : null;
 
   return (
     <section style={{position:'relative', overflow:'hidden',
@@ -544,7 +426,7 @@ function Hero() {
           <span style={{color:'var(--ink)'}}>Offers</span>
         </nav>
 
-        {OFFERS_ACTIVE ? (
+        {featured ? (
           <div className="wave-hero-grid" style={{display:'grid', gridTemplateColumns:'1.05fr 1fr', gap:64, alignItems:'center'}}>
             <div>
               <span className="eyebrow"><span className="dot"></span>Live offers</span>
@@ -582,54 +464,76 @@ function Hero() {
                     fontSize:10.5, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase',
                     background:'var(--orange)', color:'#fff', padding:'5px 10px', borderRadius:999,
                   }}>
-                    ✦ {FEATURED_OFFER.badge}
+                    ✦ {featured.badge || 'FEATURED'}
                   </span>
-                  <span style={{
-                    fontSize:10.5, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase',
-                    background:'rgba(255,255,255,.08)', color:'rgba(255,255,255,.85)',
-                    padding:'5px 10px', borderRadius:999, border:'1px solid rgba(255,255,255,.10)',
-                  }}>
-                    {FEATURED_OFFER.badgeSecondary}
-                  </span>
+                  {featured.featured_badge_secondary && (
+                    <span style={{
+                      fontSize:10.5, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase',
+                      background:'rgba(255,255,255,.08)', color:'rgba(255,255,255,.85)',
+                      padding:'5px 10px', borderRadius:999, border:'1px solid rgba(255,255,255,.10)',
+                    }}>
+                      {featured.featured_badge_secondary}
+                    </span>
+                  )}
                 </div>
-                <div style={{textAlign:'right'}}>
-                  <div style={{fontSize:10, color:'rgba(255,255,255,.55)', fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase'}}>Code</div>
-                  <div className="serif" style={{fontSize:16, fontWeight:600, marginTop:2, color:'var(--orange)'}}>
-                    {FEATURED_OFFER.code}
+                {featured.code && (
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontSize:10, color:'rgba(255,255,255,.55)', fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase'}}>Code</div>
+                    <div className="serif" style={{fontSize:16, fontWeight:600, marginTop:2, color:'var(--orange)'}}>
+                      {featured.code}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               <div style={{position:'relative', marginTop:24}}>
-                <div className="serif" style={{fontSize:54, fontWeight:600, lineHeight:1, letterSpacing:'-0.025em'}}>
-                  {FEATURED_OFFER.title}
+                <div className="serif" style={{fontSize:featured.featured_headline ? 54 : 38, fontWeight:600, lineHeight:1.05, letterSpacing:'-0.025em'}}>
+                  {featured.featured_headline || featured.title}
                 </div>
-                <div className="serif" style={{fontSize:24, fontStyle:'italic', fontWeight:500, marginTop:6, color:'rgba(255,255,255,.82)'}}>
-                  {FEATURED_OFFER.subtitle}
-                </div>
+                {featured.featured_subtitle && (
+                  <div className="serif" style={{fontSize:24, fontStyle:'italic', fontWeight:500, marginTop:6, color:'rgba(255,255,255,.82)'}}>
+                    {featured.featured_subtitle}
+                  </div>
+                )}
               </div>
 
-              <div style={{position:'relative', marginTop:20, display:'flex', alignItems:'baseline', gap:14, flexWrap:'wrap'}}>
-                <div style={{textDecoration:'line-through', color:'rgba(255,255,255,.5)', fontSize:18, fontWeight:500}}>
-                  ₹{formatINR(FEATURED_OFFER.originalPrice)}
+              {(featured.price_label || featured.final_price) && (
+                <div style={{position:'relative', marginTop:20, display:'flex', alignItems:'baseline', gap:14, flexWrap:'wrap'}}>
+                  {featured.price_label ? (
+                    <div className="serif" style={{fontSize:36, fontWeight:600, color:'#fff', letterSpacing:'-0.02em'}}>
+                      {featured.price_label}
+                    </div>
+                  ) : (
+                    <>
+                      {featured.original_price && (
+                        <div style={{textDecoration:'line-through', color:'rgba(255,255,255,.5)', fontSize:18, fontWeight:500}}>
+                          ₹{formatINR(featured.original_price)}
+                        </div>
+                      )}
+                      <div className="serif" style={{fontSize:36, fontWeight:600, color:'#fff', letterSpacing:'-0.02em'}}>
+                        ₹{formatINR(featured.final_price)}
+                      </div>
+                    </>
+                  )}
+                  {featured.price_suffix && (
+                    <div style={{fontSize:13, color:'rgba(255,255,255,.55)', fontWeight:500}}>{featured.price_suffix}</div>
+                  )}
                 </div>
-                <div className="serif" style={{fontSize:36, fontWeight:600, color:'#fff', letterSpacing:'-0.02em'}}>
-                  ₹{formatINR(FEATURED_OFFER.finalPrice)}
-                </div>
-                <div style={{fontSize:13, color:'rgba(255,255,255,.55)', fontWeight:500}}>+ GST</div>
-              </div>
+              )}
 
-              <div style={{position:'relative', marginTop:24}}>
-                <div style={{fontSize:10.5, fontWeight:700, letterSpacing:'.16em', textTransform:'uppercase', color:'rgba(255,255,255,.55)', marginBottom:10}}>
-                  Offer ends in
+              {endsAt && (
+                <div style={{position:'relative', marginTop:24}}>
+                  <div style={{fontSize:10.5, fontWeight:700, letterSpacing:'.16em', textTransform:'uppercase', color:'rgba(255,255,255,.55)', marginBottom:10}}>
+                    Offer ends in
+                  </div>
+                  <CountdownTimer endsAt={endsAt}/>
                 </div>
-                <CountdownTimer endsAt={endsAt}/>
-              </div>
+              )}
 
               <Link to="/contact" className="btn btn-primary" style={{
                 position:'relative', marginTop:24, width:'100%', justifyContent:'center',
               }}>
-                Claim {FEATURED_OFFER.title} <Icon name="arrow" size={15} stroke={2.2} className="arrow"/>
+                Claim this offer <Icon name="arrow" size={15} stroke={2.2} className="arrow"/>
               </Link>
             </div>
           </div>
@@ -662,8 +566,8 @@ function Hero() {
 // FilterStrip — sticky-feeling tab row below the hero. Receives
 // active state from page so cards filter accordingly.
 // ============================================================
-function FilterStrip({ active, setActive }) {
-  if (!OFFERS_ACTIVE) return null;
+function FilterStrip({ active, setActive, hasOffers }) {
+  if (!hasOffers) return null;
   return (
     <section style={{
       position:'relative', background:'#FBF8F1',
@@ -943,13 +847,19 @@ function FAQ() {
 // ============================================================
 export default function OffersPage() {
   const [activeCategory, setActiveCategory] = useState('all');
+  const rows = useCmsData(fetchOffers, 'offers');
+
+  // No CMS / no rows → every offer section falls back to its empty state.
+  const offers = (rows || []).map(normalizeOffer);
+  const featuredRow = (rows || []).find(r => r.is_featured) || (rows || [])[0] || null;
+  const hasOffers = offers.length > 0;
 
   return (
     <div className="design-page">
-      <Hero/>
-      <FilterStrip active={activeCategory} setActive={setActiveCategory}/>
-      <OfferCardsGrid activeCategory={activeCategory}/>
-      <HowItWorks/>
+      <Hero featured={featuredRow}/>
+      <FilterStrip active={activeCategory} setActive={setActiveCategory} hasOffers={hasOffers}/>
+      <OfferCardsGrid activeCategory={activeCategory} offers={offers}/>
+      <HowItWorks hasOffers={hasOffers}/>
       <Newsletter/>
       <FAQ/>
     </div>

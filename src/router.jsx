@@ -22,6 +22,7 @@ import AboutPage from './components/AboutPage';
 import OffersPage from './components/OffersPage';
 import ContactPage from './components/ContactPage';
 import DownloadsPage from './components/DownloadsPage';
+import NewsStrip from './components/NewsStrip';
 import { productsData } from './data/products';
 import { Banknote, MessageCircle, RefreshCw, IndianRupee, BarChart3, ShieldCheck, ArrowRight, FileText, Cloud, Wallet, Globe, Download } from 'lucide-react';
 import './index.css';
@@ -202,6 +203,8 @@ function RouterNav() {
       }`}
       role="banner"
     >
+      <NewsStrip />
+
       <div className="mx-auto flex h-[88px] max-w-7xl items-center justify-between px-5 sm:px-8">
         <BrandMark />
 

@@ -1,39 +1,44 @@
-import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon } from './design/Icon';
 import { Download } from 'lucide-react';
 import { siteConfig } from '../config/site';
+import { useCmsData, fetchDownloads } from '../lib/cms';
+import { resolveDownloadUrl } from '../data/downloads';
 
 const PHONE_DISPLAY = siteConfig.phones.sales;
 const PHONE_TEL     = siteConfig.phones.sales.replace(/\s|\+/g, '').replace(/^/, '+');
 
-// SoftTrade installers — same OneDrive URLs used on the product pricing pages
+// SoftTrade installers. URLs resolve at render time: CMS row (admin-editable)
+// first, DOWNLOAD_FALLBACKS in src/data/downloads.js when the CMS is offline.
 const SOFTTRADE_DOWNLOADS = [
   {
+    key: 'mandi',
     product: 'SoftTrade-Mandi',
     description: 'Mahajani accounting for grain, kirana and oilseed mandis.',
     image: '/softtrade-mandi-box.png',
     variants: [
-      { label: 'Single User', sublabel: 'One workstation', url: 'https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRRE9rY3J4WXBORlFhNFFuTzFRNUNvekFmcjR4MDZYOFVETjY0eldpX0NrcjJFP2U9Vmo3cnRH&cid=9962275CEB019306&id=9962275CEB019306%21sf1ca91ce93624145ae109ced50e42a33&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp' },
-      { label: 'Multi User',  sublabel: 'Unlimited LAN users', url: 'https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRQkdITHZVSFBmY1NJdkRsQVM2eTR5TUFZYjRaQ0VaRE9rWGxyQTJSV2hDeGdJP2U9SnFxaGRr&cid=9962275CEB019306&id=9962275CEB019306%21sd4bb1c46f71c48dc8bc39404bacb8c8c&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp' },
+      { key: 'single', label: 'Single User', sublabel: 'One workstation' },
+      { key: 'multi',  label: 'Multi User',  sublabel: 'Unlimited LAN users' },
     ],
   },
   {
+    key: 'brokwin',
     product: 'SoftTrade-Brokwin',
     description: 'Broker-only accounting built around the sauda.',
     image: '/brokwin-removebg-preview.png',
     variants: [
-      { label: 'Single User', sublabel: 'One workstation', url: 'https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRRGwxRHJHX2Nhc1FiNy01cEg2czNQZUFZVXQwa0FEdEhqVkpLTGxxN1BFb2pvP2U9YnUwTE01&cid=9962275CEB019306&id=9962275CEB019306%21sc63ad4e5c6fd41acbefee691fab373de&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp' },
-      { label: 'Multi User',  sublabel: 'Unlimited LAN users', url: 'https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRQmdFR0M2STN1dFJLc3JsUS1FUTJVV0FVZzhhUDE3OXZaRDFOdEZIalRLRU1NP2U9U0VUMkZu&cid=9962275CEB019306&id=9962275CEB019306%21sba6010607b2344adab2b950f84436516&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp' },
+      { key: 'single', label: 'Single User', sublabel: 'One workstation' },
+      { key: 'multi',  label: 'Multi User',  sublabel: 'Unlimited LAN users' },
     ],
   },
   {
+    key: 'coldwin',
     product: 'SoftTrade-Coldwin',
     description: 'Cold storage billing & stock register for the Indian cold chain.',
     image: '/Coldwin-removebg-preview.png',
     variants: [
-      { label: 'Single User', sublabel: 'One workstation', url: 'https://onedrive.live.com/?cid=9962275ceb019306&id=9962275CEB019306%21sfaae245eacdf4cf8b8a8f6d80b5cac8b&resid=9962275CEB019306%21sfaae245eacdf4cf8b8a8f6d80b5cac8b&e=T6SbgP&migratedtospo=true&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRQmVKSzc2MzZ6NFRMaW85dGdMWEt5TEFRUEotTWh5RGVFYy1xR2dZaHgyaldnP2U9VDZTYmdQ&v=validatepermission' },
-      { label: 'Multi User',  sublabel: 'Unlimited LAN users', url: 'https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRRGUyR2YxQ1FrM1JhN1I5NE5WbGJuNEFkMWRrS0I4cXZadmlyOUNSQmdIY1hRP2U9YmpPbGtF&cid=9962275CEB019306&id=9962275CEB019306%21sf567d8de09094537aed1f7835595b9f8&parId=9962275CEB019306%21s711b58f7a4bc4bc6a8f0c875159f065c&o=OneUp' },
+      { key: 'single', label: 'Single User', sublabel: 'One workstation' },
+      { key: 'multi',  label: 'Multi User',  sublabel: 'Unlimited LAN users' },
     ],
   },
 ];
@@ -127,7 +132,7 @@ function Hero() {
       <div style={{position:'absolute', right:'-200px', top:'-200px', width:600, height:600, borderRadius:'50%',
         background:'radial-gradient(circle, rgba(225,83,11,.10), transparent 60%)', pointerEvents:'none'}}/>
 
-      <div className="container" style={{position:'relative', padding:'140px 32px 70px'}}>
+      <div className="container wave-hero" style={{position:'relative', padding:'140px 32px 70px'}}>
         <nav aria-label="Breadcrumb" style={{
           marginBottom:24, display:'flex', alignItems:'center', gap:8,
           fontSize:12.5, fontWeight:500, color:'rgba(14,27,44,.55)',
@@ -167,6 +172,7 @@ function Hero() {
 // SoftTrade downloads section
 // ============================================================
 function SoftTradeDownloads() {
+  const cmsRows = useCmsData(fetchDownloads, 'dl');
   return (
     <section style={{padding:'80px 0', background:'#FBF8F1', borderBottom:'1px solid var(--line)'}}>
       <div className="container" style={{padding:'0 32px'}}>
@@ -180,13 +186,16 @@ function SoftTradeDownloads() {
         </div>
 
         <div style={{display:'flex', flexDirection:'column', gap:18}}>
-          {SOFTTRADE_DOWNLOADS.map((p, i) => (
+          {SOFTTRADE_DOWNLOADS.map((p) => (
             <DownloadRow
-              key={i}
+              key={p.key}
               image={p.image}
               productName={p.product}
               productDesc={p.description}
-              variants={p.variants}
+              variants={p.variants.map((v) => ({
+                ...v,
+                url: resolveDownloadUrl(cmsRows, p.key, v.key),
+              }))}
             />
           ))}
         </div>

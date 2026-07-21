@@ -53,6 +53,8 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, IconChip } from '../design/Icon';
+import { useCmsData, fetchDownloads } from '../../lib/cms';
+import { resolveDownloadUrl } from '../../data/downloads';
 
 // ============================================================
 // ChamberMap — decorative cold-storage chamber occupancy visual
@@ -345,6 +347,7 @@ function PlanCard({ tag, name, blurb, features, highlight, badge, ctaLabel = 'Ge
 // ============================================================
 
 function Pricing() {
+  const cmsRows = useCmsData(fetchDownloads, 'dl');
   return (
     <section style={{background:'#fff', padding:'104px 0', borderTop:'1px solid var(--line)', borderBottom:'1px solid var(--line)'}}>
       <div className="container">
@@ -382,7 +385,7 @@ function Pricing() {
                 'GST billing and return filing',
                 'Local Jaipur support',
               ]}
-              downloadUrl="https://onedrive.live.com/?cid=9962275ceb019306&id=9962275CEB019306%21sfaae245eacdf4cf8b8a8f6d80b5cac8b&resid=9962275CEB019306%21sfaae245eacdf4cf8b8a8f6d80b5cac8b&e=T6SbgP&migratedtospo=true&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRQmVKSzc2MzZ6NFRMaW85dGdMWEt5TEFRUEotTWh5RGVFYy1xR2dZaHgyaldnP2U9VDZTYmdQ&v=validatepermission"
+              downloadUrl={resolveDownloadUrl(cmsRows, 'coldwin', 'single')}
             />
             <PlanCard
               tag="MULTI USER · LAN"
@@ -396,7 +399,7 @@ function Pricing() {
               ]}
               highlight
               badge="MOST POPULAR"
-              downloadUrl="https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRRGUyR2YxQ1FrM1JhN1I5NE5WbGJuNEFkMWRrS0I4cXZadmlyOUNSQmdIY1hRP2U9YmpPbGtF&cid=9962275CEB019306&id=9962275CEB019306%21sf567d8de09094537aed1f7835595b9f8&parId=9962275CEB019306%21s711b58f7a4bc4bc6a8f0c875159f065c&o=OneUp"
+              downloadUrl={resolveDownloadUrl(cmsRows, 'coldwin', 'multi')}
             />
           </div>
         </div>

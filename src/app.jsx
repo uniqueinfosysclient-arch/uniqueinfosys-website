@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { siteConfig } from './config/site';
-import { softTradeShowcase } from './data/products';
 
 // ------ Validation helpers ------
 const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
@@ -634,7 +633,7 @@ function SelectField({ label, icon, value, onChange, options, placeholder = 'Cho
 // ------ Hero ------
 export function Hero() {
   return (
-    <section className="hero-bg hero-grid relative min-h-screen flex flex-col justify-center overflow-hidden pt-[112px] pb-20 sm:pt-[132px] sm:pb-24" aria-labelledby="hero-heading">
+    <section className="hero-bg hero-grid hero-top-pad relative min-h-screen flex flex-col justify-center overflow-hidden pb-20 sm:pb-24" aria-labelledby="hero-heading">
       <FloatingShapes />
 
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-5 sm:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">

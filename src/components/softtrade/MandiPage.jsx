@@ -20,6 +20,8 @@ import { Link } from 'react-router-dom';
 import { Icon, IconChip } from '../design/Icon';
 import FeatureTicker from '../products/FeatureTicker';
 import FeatureCategoryGrid from '../products/FeatureCategoryGrid';
+import { useCmsData, fetchDownloads } from '../../lib/cms';
+import { resolveDownloadUrl } from '../../data/downloads';
 
 // ============================================================
 // tickerItems / categories — additive content for the new
@@ -500,6 +502,7 @@ function PlanCard({ tag, name, blurb, features, highlight, badge, ctaLabel = 'Ge
 // ============================================================
 
 function Pricing() {
+  const cmsRows = useCmsData(fetchDownloads, 'dl');
   return (
     <section style={{background:'#fff', padding:'104px 0', borderTop:'1px solid var(--line)', borderBottom:'1px solid var(--line)'}}>
       <div className="container">
@@ -539,7 +542,7 @@ function Pricing() {
                 'GST, e-invoice, e-Way Bill ready',
                 'Local Jaipur support from Unique Info Systems',
               ]}
-              downloadUrl="https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRRE9rY3J4WXBORlFhNFFuTzFRNUNvekFmcjR4MDZYOFVETjY0eldpX0NrcjJFP2U9Vmo3cnRH&cid=9962275CEB019306&id=9962275CEB019306%21sf1ca91ce93624145ae109ced50e42a33&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp"
+              downloadUrl={resolveDownloadUrl(cmsRows, 'mandi', 'single')}
             />
             <PlanCard
               tag="MULTI USER · LAN"
@@ -553,7 +556,7 @@ function Pricing() {
               ]}
               highlight
               badge="MOST POPULAR"
-              downloadUrl="https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRQkdITHZVSFBmY1NJdkRsQVM2eTR5TUFZYjRaQ0VaRE9rWGxyQTJSV2hDeGdJP2U9SnFxaGRr&cid=9962275CEB019306&id=9962275CEB019306%21sd4bb1c46f71c48dc8bc39404bacb8c8c&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp"
+              downloadUrl={resolveDownloadUrl(cmsRows, 'mandi', 'multi')}
             />
           </div>
         </div>

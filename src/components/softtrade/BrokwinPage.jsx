@@ -42,6 +42,8 @@
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, IconChip } from '../design/Icon';
+import { useCmsData, fetchDownloads } from '../../lib/cms';
+import { resolveDownloadUrl } from '../../data/downloads';
 
 // ============================================================
 // SaudaVisual — decorative sauda contract visual on the right of
@@ -338,6 +340,7 @@ function PlanCard({ tag, name, blurb, features, highlight, badge, ctaLabel = 'Ge
 // ============================================================
 
 function Pricing() {
+  const cmsRows = useCmsData(fetchDownloads, 'dl');
   return (
     <section style={{background:'#fff', padding:'104px 0', borderTop:'1px solid var(--line)', borderBottom:'1px solid var(--line)'}}>
       <div className="container">
@@ -376,7 +379,7 @@ function Pricing() {
                 'GST-ready with e-Way Bill JSON',
                 'Local Jaipur support',
               ]}
-              downloadUrl="https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRRGwxRHJHX2Nhc1FiNy01cEg2czNQZUFZVXQwa0FEdEhqVkpLTGxxN1BFb2pvP2U9YnUwTE01&cid=9962275CEB019306&id=9962275CEB019306%21sc63ad4e5c6fd41acbefee691fab373de&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp"
+              downloadUrl={resolveDownloadUrl(cmsRows, 'brokwin', 'single')}
             />
             <PlanCard
               tag="MULTI USER · LAN"
@@ -390,7 +393,7 @@ function Pricing() {
               ]}
               highlight
               badge="MOST POPULAR"
-              downloadUrl="https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvYy85OTYyMjc1Y2ViMDE5MzA2L0lRQmdFR0M2STN1dFJLc3JsUS1FUTJVV0FVZzhhUDE3OXZaRDFOdEZIalRLRU1NP2U9U0VUMkZu&cid=9962275CEB019306&id=9962275CEB019306%21sba6010607b2344adab2b950f84436516&parId=9962275CEB019306%21sbedc6f2afeff48b78db118964be08629&o=OneUp"
+              downloadUrl={resolveDownloadUrl(cmsRows, 'brokwin', 'multi')}
             />
           </div>
         </div>
