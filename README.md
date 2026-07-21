@@ -34,11 +34,40 @@ src/
   router.jsx         # Routing, nav, footer, layout, app entry point
   config/
     site.js          # Brand config (name, phones, socials, address, etc.)
+  lib/cms.js         # CMS data layer (fetch + fallback, see below)
+  data/downloads.js  # Fallback installer URLs when the CMS is offline
   index.css          # Tailwind theme extensions + custom animations
+admin/               # Separate admin panel app (own Vite project, see below)
+supabase/            # One-time Supabase setup: setup.sql, seed.sql, SETUP.md
 public/
   favicon.svg        # Brand favicon
 index.html           # Vite entry point with SEO meta tags
 ```
+
+## Admin-managed content (CMS)
+
+Three things on the site are editable by the client through the admin panel in
+`admin/` — a separate Vite app deployed as its own Vercel project, backed by a
+free-tier Supabase project (Postgres + Auth + Storage):
+
+- **Homepage news strip** — rotating updates pill under the nav (`src/components/NewsStrip.jsx`); hidden when there are no active items
+- **About-page gallery** — photo slideshow (`src/components/AboutGallery.jsx`); hidden when there are no active photos
+- **Download links** — the 6 SoftTrade installer URLs on `/downloads` and the three product pages
+
+The public site reads Supabase via plain `fetch` (`src/lib/cms.js`, no SDK). If
+the env vars are unset or Supabase is unreachable, the site renders exactly as it
+would without a CMS: no strip, no gallery, hardcoded download links from
+`src/data/downloads.js`.
+
+Setup (one time): follow `supabase/SETUP.md`. Env vars for **both** apps:
+
+```
+VITE_SUPABASE_URL=       # Supabase → Settings → API → Project URL
+VITE_SUPABASE_ANON_KEY=  # Supabase → Settings → API → anon public key
+```
+
+Local: `.env.local` (site) and `admin/.env.local` (admin). Production: set on both
+Vercel projects. Admin app dev: `cd admin && npm install && npm run dev`.
 
 ## Configuration
 

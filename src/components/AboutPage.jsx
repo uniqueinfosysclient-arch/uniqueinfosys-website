@@ -53,6 +53,8 @@
 import { Link } from 'react-router-dom';
 import { Icon, IconChip } from './design/Icon';
 import { siteConfig } from '../config/site';
+import AboutGallery from './AboutGallery';
+import { useCmsData, fetchGallery } from '../lib/cms';
 
 const PHONE_DISPLAY = siteConfig.phones.sales;             // '+91 98290 06111'
 const PHONE_TEL     = siteConfig.phones.sales.replace(/\s|\+/g, '').replace(/^/, '+'); // '+919829006111'
@@ -73,14 +75,17 @@ const EMAIL_LINE = siteConfig.emails.sales;
 // Hero
 // ============================================================
 
-function Hero() {
+// `underGallery` = the gallery banner is rendering above us, so the fixed
+// nav is already cleared and the hero only needs normal section padding.
+function Hero({ underGallery }) {
   return (
     <section style={{position:'relative', overflow:'hidden',
       background:'linear-gradient(180deg,#F4EEDF 0%,#FBF8F1 100%)', borderBottom:'1px solid var(--line)'}}>
       <div className="paper-grid" style={{position:'absolute', inset:0, opacity:.4, pointerEvents:'none',
         maskImage:'radial-gradient(ellipse at top right, black, transparent 70%)',
         WebkitMaskImage:'radial-gradient(ellipse at top right, black, transparent 70%)'}}/>
-      <div className="container wave-hero" style={{position:'relative', padding:'152px 32px 100px'}}>
+      <div className={`container${underGallery ? '' : ' wave-hero'}`}
+           style={{position:'relative', padding: underGallery ? '84px 32px 100px' : '152px 32px 100px'}}>
         <div className="wave-hero-grid" style={{display:'grid', gridTemplateColumns:'1.2fr 1fr', gap:64, alignItems:'center'}}>
           <div>
             <div style={{display:'flex', gap:10, alignItems:'center', flexWrap:'wrap'}}>
@@ -318,9 +323,13 @@ function Visit() {
 // ============================================================
 
 export default function AboutPage() {
+  const images = useCmsData(fetchGallery, 'gallery');
+  const hasGallery = Array.isArray(images) && images.length > 0;
+
   return (
     <div className="design-page">
-      <Hero/>
+      {hasGallery && <AboutGallery images={images} />}
+      <Hero underGallery={hasGallery} />
       <Story/>
       <Values/>
       <Team/>

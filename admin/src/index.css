@@ -1,0 +1,230 @@
+/* ============================================================
+   UIS Admin — styles.
+   Tokens + core utilities copied from the public site's Wave 3
+   design system (src/index.css) so the admin matches the brand,
+   plus admin-only form/list styles below.
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Ink (text) */
+  --ink: #0E1B2C;
+  --ink-2: #16263C;
+  --ink-soft: #3B4A60;
+  --muted: #6B7A90;
+
+  /* Hairlines */
+  --line: #E6E1D6;
+  --line-2: #D9D3C3;
+
+  /* Paper / cream surfaces */
+  --paper: #F6F1E6;
+  --paper-2: #EFE7D3;
+  --bg: #FBF8F1;
+
+  /* Brand */
+  --orange: #E1530B;
+  --orange-2: #C9430A;
+  --orange-soft: #FBE6D6;
+
+  /* Accent */
+  --teal: #0F8A6F;
+  --teal-soft: #D9F0E7;
+
+  /* Status */
+  --red: #B23A2A;
+  --red-soft: #F8E3DF;
+}
+
+.design-page {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.design-page .serif {
+  font-family: 'Fraunces', serif;
+  font-feature-settings: "ss01", "ss02";
+  letter-spacing: -0.01em;
+}
+.design-page .mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Cards */
+.design-page .card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+/* Section headings */
+.design-page .section-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 10px;
+}
+
+/* Buttons */
+.design-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.design-page .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.design-page .btn-primary {
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 1px 0 rgba(0,0,0,.05), inset 0 -2px 0 rgba(0,0,0,.10);
+}
+.design-page .btn-primary:hover:not(:disabled) { background: var(--orange-2); transform: translateY(-1px); }
+.design-page .btn-dark { background: var(--ink); color: #fff; }
+.design-page .btn-dark:hover:not(:disabled) { background: var(--ink-2); transform: translateY(-1px); }
+.design-page .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-2); }
+.design-page .btn-ghost:hover:not(:disabled) { background: var(--paper); }
+.design-page .btn-danger { background: transparent; color: var(--red); border-color: var(--line-2); }
+.design-page .btn-danger:hover:not(:disabled) { background: var(--red-soft); border-color: var(--red); }
+
+/* ============================================================
+   Admin-only styles
+   ============================================================ */
+
+/* Form fields */
+.design-page .field { display: block; margin-bottom: 16px; }
+.design-page .field > span {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 7px;
+}
+.design-page .field input,
+.design-page .field textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.design-page .field textarea { resize: vertical; line-height: 1.5; }
+.design-page .field textarea.mono { font-size: 12px; }
+.design-page .field input:focus,
+.design-page .field textarea:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--orange-soft);
+}
+
+/* Toggle switch */
+.design-page .switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: var(--line-2);
+  transition: background .2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+.design-page .switch::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(14,27,44,.25);
+  transition: transform .2s ease;
+}
+.design-page .switch[data-on="true"] { background: var(--teal); }
+.design-page .switch[data-on="true"]::after { transform: translateX(18px); }
+
+/* List rows */
+.design-page .row-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.design-page .row-card[data-inactive="true"] { background: var(--paper); opacity: .75; }
+
+/* Icon-only button (reorder, delete) */
+.design-page .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--line-2);
+  background: #fff;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+  padding: 0;
+}
+.design-page .icon-btn:hover:not(:disabled) { background: var(--paper); color: var(--ink); }
+.design-page .icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+/* Status text */
+.design-page .status-ok  { font-size: 13px; font-weight: 600; color: var(--teal); }
+.design-page .status-err { font-size: 13px; font-weight: 600; color: var(--red); }
+
+/* Sidebar nav link */
+.design-page .side-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease;
+}
+.design-page .side-link:hover { background: var(--paper); color: var(--ink); }
+.design-page .side-link.active { background: var(--ink); color: #fff; }
+
+/* Spinner */
+@keyframes adminSpin { to { transform: rotate(360deg); } }
+.design-page .spin { animation: adminSpin .8s linear infinite; }
+
+/* Layout helpers */
+.design-page .admin-main { flex: 1; min-width: 0; padding: 36px 40px 80px; }
+@media (max-width: 860px) {
+  .design-page .admin-shell { flex-direction: column !important; }
+  .design-page .admin-side {
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--line);
+  }
+  .design-page .admin-side nav { display: flex !important; gap: 6px; }
+  .design-page .admin-main { padding: 24px 18px 60px; }
+}
