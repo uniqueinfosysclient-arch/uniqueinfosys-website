@@ -18,6 +18,7 @@ import ServerPage from './components/tally/ServerPage';
 import BizAnalystPage from './components/tally/BizAnalystPage';
 import CustomizationPage from './components/services/CustomizationPage';
 import SupportPage from './components/services/SupportPage';
+import TallyCapitalPage from './components/services/TallyCapitalPage';
 import AboutPage from './components/AboutPage';
 import OffersPage from './components/OffersPage';
 import ContactPage from './components/ContactPage';
@@ -41,6 +42,7 @@ const TALLY_PRODUCTS = [
 ];
 
 const TALLY_SERVICES = [
+  { label: 'Tally Capital',          to: '/services/tally-capital',  desc: 'Business loans inside TallyPrime' },
   { label: 'Tally Customization',   to: '/services/customization',  desc: 'TDL, custom reports & modules' },
   { label: 'Corporate Training',    to: '/services/training',       desc: '1-on-1 and group sessions' },
   { label: 'Tally Integration',     to: '/services/integration',    desc: 'Connect Tally to any system' },
@@ -1209,6 +1211,7 @@ function RouterApp() {
 
           {/* Services */}
           <Route path="services"               element={<ServicesIndex />} />
+          <Route path="services/tally-capital" element={<TallyCapitalPage />} />
           <Route path="services/customization" element={<CustomizationPage />} />
           <Route path="services/training"      element={<ProductPricingPage product={productsData.training} />} />
           <Route path="services/integration"   element={<ProductPricingPage product={productsData.integration} />} />
