@@ -4,28 +4,27 @@
 // Route: /services/tally-capital
 //
 // SOP compliance map:
-//   - TallyCapital logo displayed prominently (hero, form card, final CTA)
+//   - TallyCapital logo displayed prominently (hero, final CTA)
 //   - Approved hero headline: "Simple, Smart & Superior Financing Solution
 //     Integrated within TallyPrime"
 //   - 4 mandatory hero USPs: Pre-Qualified Offers for Tally Users /
 //     Choose from Multiple Lenders / Check Loan Eligibility / Free Credit Score
 //   - Official TallyCapital YouTube video embedded (youtu.be/4LJa6iKgrpE)
 //   - Link to the official TallyCapital website
-//   - Lead-gen form with Name / Phone Number / Email Address / Comments,
-//     leads delivered by mail (mailto submit), WhatsApp offered as a fallback
+//   - Enquiries go through the homepage's existing "Send a WhatsApp"
+//     CallbackCard, alongside call and email tiles
 //
 // Follows the existing .design-page convention used by the other
 // Wave 3 pages (SupportPage, CustomizationPage, softtrade/*).
 // Artwork: official TallyCapital partner graphics in /public/tallycapital/.
 
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, IconChip } from '../design/Icon';
 import { siteConfig } from '../../config/site';
+import { CallbackCard } from '../../app';
 
 const PHONE_DISPLAY  = siteConfig.phones.sales;
 const PHONE_TEL      = '+919829006111';
-const WHATSAPP_NUM   = siteConfig.whatsapp;
 const LEAD_EMAIL     = siteConfig.emails.sales;
 const OFFICIAL_SITE  = 'https://tallycapital.tallysolutions.com/';
 const YT_ID          = '4LJa6iKgrpE';
@@ -423,7 +422,7 @@ function VideoSection() {
 }
 
 // ============================================================
-// Lead-gen form — Name / Phone / Email / Comments, delivered by mail
+// Get started — call / email tiles + the site's WhatsApp card
 // ============================================================
 const tileStyle = {
   display: 'flex', alignItems: 'center', gap: 14,
@@ -435,103 +434,7 @@ const tileLabel = {
 };
 const tileValue = { fontSize: 14.5, fontWeight: 600, color: 'var(--ink)', marginTop: 3 };
 
-const labelStyle = {
-  display: 'block', fontSize: 10.5, fontWeight: 700, letterSpacing: '.14em',
-  textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 7,
-};
-const inputStyle = (hasError) => ({
-  width: '100%', padding: '12px 14px', fontSize: 14,
-  border: `1px solid ${hasError ? 'var(--red)' : 'var(--line)'}`,
-  borderRadius: 10, background: 'var(--bg)', color: 'var(--ink)',
-  outline: 'none', fontFamily: 'inherit',
-  transition: 'border-color .2s ease',
-});
-
-function LeadForm() {
-  const [name, setName]         = useState('');
-  const [phone, setPhone]       = useState('');
-  const [email, setEmail]       = useState('');
-  const [comments, setComments] = useState('');
-  const [website, setWebsite]   = useState('');   // honeypot — humans never see it
-  const [errors, setErrors]     = useState({});
-  // 'idle' | 'sending' | 'sent' | 'failed'
-  const [status, setStatus]     = useState('idle');
-  const [failMessage, setFailMessage] = useState('');
-  const [setupHint, setSetupHint]     = useState('');   // dev-only, never sent in production
-
-  const validate = () => {
-    const e = {};
-    if (!name.trim()) e.name = true;
-    if (!/^[0-9+\-\s()]{10,16}$/.test(phone.trim())) e.phone = true;
-    if (!/^\S+@\S+\.\S+$/.test(email.trim())) e.email = true;
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
-  const bodyLines = () => [
-    'TallyCapital enquiry from the website',
-    '',
-    `Name: ${name}`,
-    `Phone Number: ${phone}`,
-    `Email Address: ${email}`,
-    '',
-    `Comments: ${comments || '—'}`,
-  ].join('\n');
-
-  // Posts to the /api/lead serverless function, which stores the lead in
-  // Supabase and emails it on. If that call fails for any reason the
-  // visitor is pointed at WhatsApp and the phone number rather than being
-  // left with a dead form.
-  const onSubmit = async (ev) => {
-    ev.preventDefault();
-    if (status === 'sending' || !validate()) return;
-
-    setStatus('sending');
-    setFailMessage('');
-    setSetupHint('');
-
-    try {
-      const res = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source: 'tally-capital',
-          name: name.trim(),
-          phone: phone.trim(),
-          email: email.trim(),
-          comments: comments.trim(),
-          company_website: website,             // honeypot
-          page_url: window.location.href,
-        }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok || !data.ok) {
-        if (Array.isArray(data.fields) && data.fields.length) {
-          setErrors(Object.fromEntries(data.fields.map(f => [f, true])));
-        }
-        if (data.setup) setSetupHint(data.setup);
-        throw new Error(data.error || 'Something went wrong.');
-      }
-
-      setStatus('sent');
-      setName(''); setPhone(''); setEmail(''); setComments('');
-    } catch (err) {
-      setStatus('failed');
-      setFailMessage(
-        err?.message && !/fetch|network/i.test(err.message)
-          ? err.message
-          : 'We could not send your enquiry just now.'
-      );
-    }
-  };
-
-  const onWhatsApp = () => {
-    if (!validate()) return;
-    window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(bodyLines())}`, '_blank', 'noopener');
-  };
-
+function GetStarted() {
   return (
     <section id="tc-lead" style={{ background: 'var(--bg)', padding: '80px 0', borderBottom: '1px solid var(--line)', scrollMarginTop: 100 }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
@@ -568,130 +471,8 @@ function LeadForm() {
             </p>
           </div>
 
-          {/* RIGHT — form card */}
-          <div style={{
-            background: '#fff', border: '1px solid var(--line)', borderRadius: 18, padding: '28px 26px',
-            boxShadow: '0 30px 60px -34px rgba(14,27,44,.35)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-              <img src={IMG.logo} alt="TallyCapital" style={{ height: 34, width: 'auto' }} />
-              <span style={{
-                fontSize: 10.5, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase',
-                color: 'var(--teal)', background: 'var(--teal-soft)', padding: '5px 11px', borderRadius: 999,
-              }}>
-                Enquiry form
-              </span>
-            </div>
-
-            <form onSubmit={onSubmit} noValidate>
-              <div style={{ marginBottom: 14 }}>
-                <label style={labelStyle}>Name <span style={{ color: 'var(--orange)' }}>*</span></label>
-                <input
-                  type="text" value={name} autoComplete="name"
-                  onChange={(e) => { setName(e.target.value); if (errors.name) setErrors({ ...errors, name: undefined }); }}
-                  placeholder="Your full name"
-                  style={inputStyle(errors.name)}
-                />
-              </div>
-
-              <div className="tc-form-row" style={{ marginBottom: 14 }}>
-                <div>
-                  <label style={labelStyle}>Phone Number <span style={{ color: 'var(--orange)' }}>*</span></label>
-                  <input
-                    type="tel" value={phone} autoComplete="tel"
-                    onChange={(e) => { setPhone(e.target.value); if (errors.phone) setErrors({ ...errors, phone: undefined }); }}
-                    placeholder="+91 98290 00000"
-                    style={inputStyle(errors.phone)}
-                  />
-                </div>
-                <div>
-                  <label style={labelStyle}>Email Address <span style={{ color: 'var(--orange)' }}>*</span></label>
-                  <input
-                    type="email" value={email} autoComplete="email"
-                    onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors({ ...errors, email: undefined }); }}
-                    placeholder="you@company.com"
-                    style={inputStyle(errors.email)}
-                  />
-                </div>
-              </div>
-
-              <div style={{ marginBottom: 18 }}>
-                <label style={labelStyle}>Comments</label>
-                <textarea
-                  value={comments} rows={3}
-                  onChange={(e) => setComments(e.target.value)}
-                  placeholder="e.g. We run a trading firm in Jaipur and want to check working-capital options."
-                  style={{ ...inputStyle(false), resize: 'vertical', minHeight: 84, fontFamily: 'inherit' }}
-                />
-              </div>
-
-              {/* Honeypot — offscreen, not tabbable, ignored by humans. */}
-              <div aria-hidden style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
-                <label htmlFor="tc-company-website">Company website</label>
-                <input
-                  id="tc-company-website" name="company_website" type="text"
-                  tabIndex={-1} autoComplete="off"
-                  value={website} onChange={(e) => setWebsite(e.target.value)}
-                />
-              </div>
-
-              {Object.keys(errors).length > 0 && status !== 'sent' && (
-                <div style={{
-                  fontSize: 12.5, color: 'var(--red)', background: '#FCEEEC',
-                  border: '1px solid #F0D3CE', borderRadius: 10, padding: '9px 12px', marginBottom: 14,
-                }}>
-                  Please enter a valid name, phone number and email address.
-                </div>
-              )}
-
-              {status === 'sent' && (
-                <div style={{
-                  display: 'flex', gap: 9, alignItems: 'flex-start',
-                  fontSize: 12.5, color: 'var(--teal)', background: 'var(--teal-soft)',
-                  borderRadius: 10, padding: '11px 13px', marginBottom: 14, lineHeight: 1.55,
-                }}>
-                  <Icon name="check" size={14} stroke={2.6} style={{ flexShrink: 0, marginTop: 1 }} />
-                  <span>
-                    Thank you — your enquiry has reached our team. We usually respond the same working day.
-                  </span>
-                </div>
-              )}
-
-              {status === 'failed' && (
-                <div style={{
-                  fontSize: 12.5, color: 'var(--red)', background: '#FCEEEC',
-                  border: '1px solid #F0D3CE', borderRadius: 10, padding: '11px 13px', marginBottom: 14, lineHeight: 1.55,
-                }}>
-                  {failMessage} Please send it on WhatsApp instead, or call us on{' '}
-                  <a href={`tel:${PHONE_TEL}`} style={{ color: 'var(--red)', fontWeight: 600 }}>{PHONE_DISPLAY}</a>.
-                  {setupHint && (
-                    <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #F0D3CE', fontSize: 11.5, color: 'var(--muted)' }}>
-                      {setupHint}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  style={{ padding: '13px 22px', opacity: status === 'sending' ? 0.6 : 1 }}
-                  disabled={status === 'sending'}
-                >
-                  {status === 'sending' ? 'Sending…' : 'Send Enquiry'}
-                  {status !== 'sending' && <Icon name="arrow" size={15} stroke={2.2} className="arrow" />}
-                </button>
-                <button type="button" onClick={onWhatsApp} className="btn btn-ghost" style={{ padding: '13px 20px' }}>
-                  <Icon name="wa" size={15} stroke={2} /> WhatsApp instead
-                </button>
-              </div>
-
-              <p style={{ fontSize: 11.5, color: 'var(--muted)', marginTop: 14, lineHeight: 1.55 }}>
-                Your details reach our team by email and are used only to respond to this enquiry.
-              </p>
-            </form>
-          </div>
+          {/* RIGHT — the same WhatsApp card as the homepage hero */}
+          <CallbackCard />
         </div>
       </div>
     </section>
@@ -769,7 +550,6 @@ const TC_CSS = `
 .tc-steps     { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:20px; }
 .tc-sol-grid  { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:20px; }
 .tc-feat-grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:22px; }
-.tc-form-row  { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
 
 @media (max-width: 1000px) {
   .tc-hero-grid { grid-template-columns: 1fr; gap:40px; }
@@ -783,7 +563,6 @@ const TC_CSS = `
   .tc-stat-row  { grid-template-columns: repeat(2, minmax(0,1fr)); gap:24px; }
   .tc-sol-grid  { grid-template-columns: 1fr; }
   .tc-feat-grid { grid-template-columns: 1fr; }
-  .tc-form-row  { grid-template-columns: 1fr; }
 }
 `;
 
@@ -801,7 +580,7 @@ export default function TallyCapitalPage() {
       <Solutions />
       <Features />
       <VideoSection />
-      <LeadForm />
+      <GetStarted />
       <FinalCTA />
     </div>
   );

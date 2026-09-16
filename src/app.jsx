@@ -273,7 +273,7 @@ function FloatingShapes() {
 }
 
 // ------ Callback form card ------
-function CallbackCard() {
+export function CallbackCard() {
   const [form, setForm] = useState({ name: '', interests: [], message: '' });
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
