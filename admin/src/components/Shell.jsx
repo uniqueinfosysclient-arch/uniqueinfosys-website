@@ -2,7 +2,7 @@
 // App frame: brand sidebar with nav + logout, content area for routes.
 
 import { NavLink } from 'react-router-dom';
-import { Newspaper, Images, Download, Tag, LogOut } from 'lucide-react';
+import { Newspaper, Images, Download, Tag, Inbox, LogOut } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { to: '/offers', label: 'Offers', icon: Tag },
   { to: '/gallery', label: 'Gallery', icon: Images },
   { to: '/downloads', label: 'Download links', icon: Download },
+  { to: '/leads', label: 'Website leads', icon: Inbox },
 ];
 
 export default function Shell({ children }) {

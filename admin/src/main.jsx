@@ -8,6 +8,7 @@ import NewsAdmin from './pages/NewsAdmin';
 import OffersAdmin from './pages/OffersAdmin';
 import GalleryAdmin from './pages/GalleryAdmin';
 import DownloadsAdmin from './pages/DownloadsAdmin';
+import LeadsAdmin from './pages/LeadsAdmin';
 import './index.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
               <Route path="/offers" element={<OffersAdmin />} />
               <Route path="/gallery" element={<GalleryAdmin />} />
               <Route path="/downloads" element={<DownloadsAdmin />} />
+              <Route path="/leads" element={<LeadsAdmin />} />
               <Route path="*" element={<Navigate to="/news" replace />} />
             </Routes>
           </Shell>
